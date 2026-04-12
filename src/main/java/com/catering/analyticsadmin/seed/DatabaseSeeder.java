@@ -37,220 +37,173 @@ public class DatabaseSeeder {
             LocalDateTime now = LocalDateTime.now();
 
             // --- ADMIN ---
-            Administrator admin = administratorRepository.save(
-                    Administrator.builder()
-                            .username("sysadmin")
-                            .email("admin@eliteevents.ba")
-                            .passwordHash("$2a$10$examplehash")
-                            .firstName("System")
-                            .lastName("Admin")
-                            .role("SUPER_ADMIN")
-                            .active(true)
-                            .createdAt(now)
-                            .build()
-            );
+            Administrator admin = new Administrator("sysadmin",
+                    "admin@eliteevents.ba",
+                    "$2a$10$examplehash",
+                    "System",
+                    "Admin",
+                    "SUPER_ADMIN");
+
+            admin = administratorRepository.save(admin);
 
             // --- OFFER TYPES ---
-            OfferType decoration = offerTypeRepository.save(
-                    OfferType.builder().name("Decoration").build()
-            );
+            OfferType decoration = new OfferType("Decoration");
+            decoration = offerTypeRepository.save(decoration);
 
-            OfferType music = offerTypeRepository.save(
-                    OfferType.builder().name("Music Service").build()
-            );
+            OfferType music = new OfferType("Music Service");
+            music = offerTypeRepository.save(music);
 
-            OfferType catering = offerTypeRepository.save(
-                    OfferType.builder().name("Catering").build()
-            );
+            OfferType catering = new OfferType("Catering");
+            catering = offerTypeRepository.save(catering);
 
             // --- PARTNERS ---
-            Partner partner1 = partnerRepository.save(
-                    Partner.builder()
-                            .name("Event Partner d.o.o.")
-                            .email("info@eventpartner.ba")
-                            .contactPerson("Amra Kovac")
-                            .contactPhone("+38761111222")
-                            .websiteUrl("https://eventpartner.ba")
-                            .build()
-            );
+            Partner partner1 = new Partner(
+                    "Event Partner d.o.o.",
+                    "info@eventpartner.ba",
+                    "Amra Kovac",
+                    "+38761111222",
+                    "https://eventpartner.ba");
+            partner1 = partnerRepository.save(partner1);
 
-            Partner partner2 = partnerRepository.save(
-                    Partner.builder()
-                            .name("Dekor Studio")
-                            .email("kontakt@dekor.ba")
-                            .contactPerson("Haris Music")
-                            .contactPhone("+38762222333")
-                            .websiteUrl("https://dekor.ba")
-                            .build()
-            );
+            Partner partner2 = new Partner(
+                    "Dekor Studio",
+                    "kontakt@dekor.ba",
+                    "Haris Music",
+                    "+38762222333",
+                    "https://dekor.ba");
+            partner2 = partnerRepository.save(partner2);
 
             // --- PARTNER OFFERS ---
-            partnerOfferRepository.save(
-                    PartnerOffer.builder()
-                            .partner(partner1)
-                            .offerType(music)
-                            .description("Live music and sound support")
-                            .price(1200.0)
-                            .build()
-            );
+            PartnerOffer partnerOffer1 = new PartnerOffer(
+                    partner1,
+                    music,
+                    "Live music and sound support",
+                    1200.0);
+            partner1.addOffer(partnerOffer1);
+            music.addPartnerOffer(partnerOffer1);
+            partnerOfferRepository.save(partnerOffer1);
 
-            partnerOfferRepository.save(
-                    PartnerOffer.builder()
-                            .partner(partner2)
-                            .offerType(decoration)
-                            .description("Wedding decoration services")
-                            .price(900.0)
-                            .build()
-            );
+            PartnerOffer partnerOffer2 = new PartnerOffer(
+                    partner2,
+                    decoration,
+                    "Wedding decoration services",
+                    900.0);
+            partner2.addOffer(partnerOffer2);
+            decoration.addPartnerOffer(partnerOffer2);
+            partnerOfferRepository.save(partnerOffer2);
 
-            partnerOfferRepository.save(
-                    PartnerOffer.builder()
-                            .partner(partner1)
-                            .offerType(catering)
-                            .description("Full catering service")
-                            .price(3000.0)
-                            .build()
-            );
+            PartnerOffer partnerOffer3 = new PartnerOffer(
+                    partner1,
+                    catering,
+                    "Full catering service",
+                    3000.0);
+            partner1.addOffer(partnerOffer3);
+            catering.addPartnerOffer(partnerOffer3);
+            partnerOfferRepository.save(partnerOffer3);
 
             // --- ADMIN LOGS ---
-            adminLogRepository.save(
-                    AdminLog.builder()
-                            .administrator(admin)
-                            .action("CREATE_PARTNER")
-                            .timestamp(now)
-                            .details("Initial partner created")
-                            .build()
-            );
+            AdminLog adminLog = new AdminLog(admin, "CREATE_PARTNER", now, "Initial partner created.");
+            adminLogRepository.save(adminLog);
 
             // --- AI INTERACTIONS ---
-            aiInteractionRepository.save(
-                    AiInteraction.builder()
-                            .clientId(101L)
-                            .sessionId("sess-001")
-                            .question("Who offers catering?")
-                            .answer("Event Partner d.o.o.")
-                            .timestamp(now)
-                            .build()
-            );
+            AiInteraction aiInteraction = new AiInteraction(
+                    101L,
+                    "sess-001",
+                    "Who offers catering?",
+                    "Event Partner d.o.o.",
+                    now);
+            aiInteractionRepository.save(aiInteraction);
 
             // --- EMPLOYEE ANALYTICS ---
-            employeeAnalyticsRepository.save(
-                    EmployeeAnalytics.builder()
-                            .employeeId(1L)
-                            .employeeName("Sarah Johnson")
-                            .periodType(PeriodType.MONTHLY)
-                            .periodLabel("2026-04")
-                            .ticketsProcessed(156)
-                            .salesCompleted(89)
-                            .revenueGenerated(245000.0)
-                            .performanceRating(4.8)
-                            .createdAt(now)
-                            .build()
-            );
+            EmployeeAnalytics employee1 = new EmployeeAnalytics(
+                    1L,
+                    "Sarah Johnson",
+                    PeriodType.MONTHLY,
+                    "2026-04",
+                    156,
+                    89,
+                    245000.0,
+                    4.8,
+                    now);
+            employeeAnalyticsRepository.save(employee1);
 
-            employeeAnalyticsRepository.save(
-                    EmployeeAnalytics.builder()
-                            .employeeId(2L)
-                            .employeeName("Michael Chen")
-                            .periodType(PeriodType.MONTHLY)
-                            .periodLabel("2026-04")
-                            .ticketsProcessed(142)
-                            .salesCompleted(76)
-                            .revenueGenerated(198000.0)
-                            .performanceRating(4.6)
-                            .createdAt(now)
-                            .build()
-            );
+            EmployeeAnalytics employee2 = new EmployeeAnalytics(
+                    2L,
+                    "Michael Chen",
+                    PeriodType.MONTHLY,
+                    "2026-04",
+                    142,
+                    76,
+                    198000.0,
+                    4.6,
+                    now);
+            employeeAnalyticsRepository.save(employee2);
 
             // --- CLIENT ANALYTICS ---
-            clientAnalyticsRepository.save(
-                    ClientAnalytics.builder()
-                            .clientId(101L)
-                            .clientName("Client A")
-                            .periodType(PeriodType.MONTHLY)
-                            .periodLabel("2026-04")
-                            .eventsCount(5)
-                            .totalSpent(12000.0)
-                            .isActive(true)
-                            .isReturning(true)
-                            .createdAt(now)
-                            .build()
-            );
+            ClientAnalytics client1 = new ClientAnalytics(
+                    101L,
+                    "Client A",
+                    PeriodType.MONTHLY,
+                    "2026-04",
+                    5,
+                    12000.0,
+                    true,
+                    true,
+                    now);
+            clientAnalyticsRepository.save(client1);
 
-            clientAnalyticsRepository.save(
-                    ClientAnalytics.builder()
-                            .clientId(102L)
-                            .clientName("Client B")
-                            .periodType(PeriodType.MONTHLY)
-                            .periodLabel("2026-04")
-                            .eventsCount(1)
-                            .totalSpent(3200.0)
-                            .isActive(true)
-                            .isReturning(false)
-                            .createdAt(now)
-                            .build()
-            );
+            ClientAnalytics client2 = new ClientAnalytics(
+                    102L,
+                    "Client B",
+                    PeriodType.MONTHLY,
+                    "2026-04",
+                    1,
+                    3200.0,
+                    true,
+                    false,
+                    now);
+            clientAnalyticsRepository.save(client2);
 
             // --- SERVICE POPULARITY ---
-            servicePopularityRepository.save(
-                    ServicePopularity.builder()
-                            .serviceName("Wedding Catering")
-                            .serviceCategory("Catering")
-                            .periodType(PeriodType.MONTHLY)
-                            .periodLabel("2026-04")
-                            .selectionCount(145)
-                            .revenueGenerated(320000.0)
-                            .createdAt(now)
-                            .build()
-            );
+            ServicePopularity service1 = new ServicePopularity(
+                    "Wedding Catering",
+                    "Catering",
+                    PeriodType.MONTHLY,
+                    "2026-04",
+                    145,
+                    320000.0,
+                    now);
+            servicePopularityRepository.save(service1);
 
-            servicePopularityRepository.save(
-                    ServicePopularity.builder()
-                            .serviceName("Decoration Package")
-                            .serviceCategory("Decoration")
-                            .periodType(PeriodType.MONTHLY)
-                            .periodLabel("2026-04")
-                            .selectionCount(76)
-                            .revenueGenerated(95000.0)
-                            .createdAt(now)
-                            .build()
-            );
+            ServicePopularity service2 = new ServicePopularity(
+                    "Decoration Package",
+                    "Decoration",
+                    PeriodType.MONTHLY,
+                    "2026-04",
+                    76,
+                    95000.0,
+                    now);
+            servicePopularityRepository.save(service2);
 
             // --- FINANCIAL ANALYTICS ---
-            financialAnalyticsRepository.save(
-                    FinancialAnalytics.builder()
-                            .periodType(PeriodType.MONTHLY)
-                            .periodLabel("2026-04")
-                            .totalRevenue(739000.0)
-                            .totalExpenses(420000.0)
-                            .netProfit(319000.0)
-                            .paidInvoicesCount(120)
-                            .unpaidInvoicesCount(15)
-                            .averageEventValue(3344.0)
-                            .createdAt(now)
-                            .build()
-            );
+            FinancialAnalytics financialAnalytics = new FinancialAnalytics(
+                    PeriodType.MONTHLY,
+                    "2026-04",
+                    739000.0,
+                    420000.0,
+                    319000.0,
+                    120,
+                    15,
+                    3344.0,
+                    now);
+            financialAnalyticsRepository.save(financialAnalytics);
 
             // --- REVENUE TREND ---
-            revenueTrendRepository.save(
-                    RevenueTrend.builder()
-                            .year(2026)
-                            .month(1)
-                            .revenue(50000.0)
-                            .eventsCount(20)
-                            .createdAt(now)
-                            .build()
-            );
+            RevenueTrend revenueTrend1 = new RevenueTrend(2026, 1, 50000.0, 20, now);
+            revenueTrendRepository.save(revenueTrend1);
 
-            revenueTrendRepository.save(
-                    RevenueTrend.builder()
-                            .year(2026)
-                            .month(2)
-                            .revenue(54000.0)
-                            .eventsCount(22)
-                            .createdAt(now)
-                            .build()
-            );
+            RevenueTrend revenueTrend2 = new RevenueTrend(2026, 2, 54000.0, 22, now);
+            revenueTrendRepository.save(revenueTrend2);
 
             System.out.println("=== DATA SEEDER FINISHED ===");
         };
