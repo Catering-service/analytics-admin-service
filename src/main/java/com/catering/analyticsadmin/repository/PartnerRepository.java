@@ -1,6 +1,6 @@
 package com.catering.analyticsadmin.repository;
 
-import com.catering.analyticsadmin.model.Partner;
+import com.catering.analyticsadmin.model.entity.Partner;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

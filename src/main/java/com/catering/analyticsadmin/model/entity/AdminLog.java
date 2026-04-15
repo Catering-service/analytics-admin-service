@@ -1,9 +1,9 @@
-package com.catering.analyticsadmin.model;
+package com.catering.analyticsadmin.model.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 
 import java.time.LocalDateTime;
-import java.util.Objects;
 
 @Entity
 @Table(name = "admin_logs")
@@ -17,6 +17,7 @@ public class AdminLog {
     @JoinColumn(name = "admin_id", nullable = false)
     private Administrator administrator;
 
+    @NotBlank(message = "Action is required")
     @Column(name = "action", nullable = false)
     private String action;
 

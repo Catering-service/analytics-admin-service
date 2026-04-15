@@ -1,7 +1,6 @@
-package com.catering.analyticsadmin.model;
+package com.catering.analyticsadmin.model.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -17,11 +16,9 @@ public class AiInteraction {
     @Column(name = "client_id", nullable = false)
     private Long clientId;
 
-    @NotBlank
     @Column(name = "session_id", nullable = false)
     private String sessionId;
 
-    @NotBlank
     @Column(columnDefinition = "TEXT", nullable = false)
     private String question;
 

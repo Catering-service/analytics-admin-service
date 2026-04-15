@@ -1,11 +1,15 @@
-package com.catering.analyticsadmin.model;
+package com.catering.analyticsadmin.model.entity;
 
+import com.catering.analyticsadmin.model.enums.AdminRole;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotNull;
+
 
 @Entity
 @Table(name = "administrators")
@@ -15,27 +19,37 @@ public class Administrator {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "Username is required")
     @Column(name = "username", nullable = false, unique = true)
     private String username;
 
+    @NotBlank(message = "Email is required")
+    @Email(message = "Email must be valid")
     @Column(name = "email", nullable = false, unique = true)
     private String email;
 
+    @NotBlank(message = "Password hash is required")
     @Column(name = "password_hash", nullable = false)
     private String passwordHash;
 
+    @NotBlank(message = "First name is required")
     @Column(name = "first_name", nullable = false)
     private String firstName;
 
+    @NotBlank(message = "Last name is required")
     @Column(name = "last_name", nullable = false)
     private String lastName;
 
+    @NotNull(message = "Role is required")
+    @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false)
-    private String role;
+    private AdminRole role;
 
+    @NotNull(message = "Active flag is required")
     @Column(name = "active", nullable = false)
     private Boolean active = true;
 
+    @NotNull(message = "Created at timestamp is required")
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
@@ -49,7 +63,7 @@ public class Administrator {
     }
 
     public Administrator(String username, String email, String passwordHash,
-                         String firstName, String lastName, String role) {
+                         String firstName, String lastName, AdminRole role) {
         this.username = username;
         this.email = email;
         this.passwordHash = passwordHash;
@@ -136,11 +150,11 @@ public class Administrator {
         this.lastName = lastName;
     }
 
-    public String getRole() {
+    public AdminRole getRole() {
         return role;
     }
 
-    public void setRole(String role) {
+    public void setRole(AdminRole role) {
         this.role = role;
     }
 

@@ -1,6 +1,8 @@
 package com.catering.analyticsadmin.seed;
 
-import com.catering.analyticsadmin.model.*;
+import com.catering.analyticsadmin.model.entity.*;
+import com.catering.analyticsadmin.model.enums.AdminRole;
+import com.catering.analyticsadmin.model.enums.PeriodType;
 import com.catering.analyticsadmin.repository.*;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
@@ -42,7 +44,7 @@ public class DatabaseSeeder {
                     "$2a$10$examplehash",
                     "System",
                     "Admin",
-                    "SUPER_ADMIN");
+                    AdminRole.SUPERADMIN);
 
             admin = administratorRepository.save(admin);
 

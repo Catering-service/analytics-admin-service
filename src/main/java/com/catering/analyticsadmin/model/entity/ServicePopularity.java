@@ -1,5 +1,6 @@
-package com.catering.analyticsadmin.model;
+package com.catering.analyticsadmin.model.entity;
 
+import com.catering.analyticsadmin.model.enums.PeriodType;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
