@@ -1,6 +1,8 @@
 package com.catering.analyticsadmin.model.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -13,18 +15,22 @@ public class AiInteraction {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotNull(message = "Client ID cannot be null")
     @Column(name = "client_id", nullable = false)
     private Long clientId;
 
+    @NotNull(message = "Session ID cannot be null")
     @Column(name = "session_id", nullable = false)
     private String sessionId;
 
+    @NotBlank(message = "Question cannot be blank")
     @Column(columnDefinition = "TEXT", nullable = false)
     private String question;
 
     @Column(columnDefinition = "TEXT")
     private String answer;
 
+    @NotNull(message = "Timestamp cannot be null")
     @Column(nullable = false)
     private LocalDateTime timestamp;
 
@@ -40,9 +46,10 @@ public class AiInteraction {
 
     @Override
     public boolean equals(Object o) {
+        if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         AiInteraction that = (AiInteraction) o;
-        return Objects.equals(id, that.id);
+        return id != null && id.equals(that.id);
     }
 
     @Override
