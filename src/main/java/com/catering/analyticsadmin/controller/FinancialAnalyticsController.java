@@ -4,9 +4,13 @@ import com.catering.analyticsadmin.model.dto.FinancialAnalyticsResponseDTO;
 import com.catering.analyticsadmin.service.FinancialAnalyticsService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+@RestController
+@RequestMapping("/api/financial-analytics")
 public class FinancialAnalyticsController {
     private final FinancialAnalyticsService financialAnalyticsService;
 

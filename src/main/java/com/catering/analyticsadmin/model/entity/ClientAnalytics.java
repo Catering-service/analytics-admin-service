@@ -27,12 +27,12 @@ public class ClientAnalytics {
     @Column(name = "client_name", nullable = false)
     private String clientName;
 
-    @NotBlank(message = "Period type is required")
+    @NotNull(message = "Period type is required")
     @Enumerated(EnumType.STRING)
     @Column(name = "period_type", nullable = false)
     private PeriodType periodType;
 
-    @NotBlank(message = "Period label is required")
+    @NotNull(message = "Period label is required")
     @Column(name = "period_label", nullable = false)
     private String periodLabel;
 

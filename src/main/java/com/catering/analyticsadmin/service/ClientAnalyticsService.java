@@ -4,9 +4,11 @@ import com.catering.analyticsadmin.model.dto.ClientAnalyticsResponseDTO;
 import com.catering.analyticsadmin.model.dto.FinancialAnalyticsResponseDTO;
 import com.catering.analyticsadmin.model.entity.ClientAnalytics;
 import com.catering.analyticsadmin.repository.ClientAnalyticsRepository;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Service
 public class ClientAnalyticsService {
     private final ClientAnalyticsRepository clientAnalyticsRepository;
 
@@ -25,6 +27,13 @@ public class ClientAnalyticsService {
         ClientAnalytics clientAnalytics = clientAnalyticsRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Client analytics not found"));
         return mapToResponse(clientAnalytics);
+    }
+
+    public List<ClientAnalyticsResponseDTO> getByClientId(Long clientId) {
+        return clientAnalyticsRepository.findByClientId(clientId)
+                .stream()
+                .map(this::mapToResponse)
+                .toList();
     }
 
     private ClientAnalyticsResponseDTO mapToResponse(ClientAnalytics entity) {
