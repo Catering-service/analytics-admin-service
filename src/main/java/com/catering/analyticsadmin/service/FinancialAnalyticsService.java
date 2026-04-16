@@ -45,20 +45,6 @@ public class FinancialAnalyticsService {
                 .toList();
     }
 
-    public FinancialAnalyticsResponseDTO create(FinancialAnalyticsResponseDTO request) {
-        FinancialAnalytics entity = new FinancialAnalytics();
-        entity.setPeriodType(request.getPeriodType());
-        entity.setPeriodLabel(request.getPeriodLabel());
-        entity.setTotalRevenue(request.getTotalRevenue());
-        entity.setTotalExpenses(request.getTotalExpenses());
-        entity.setNetProfit(request.getNetProfit());
-        entity.setPaidInvoicesCount(request.getPaidInvoicesCount());
-        entity.setUnpaidInvoicesCount(request.getUnpaidInvoicesCount());
-        entity.setAverageEventValue(request.getAverageEventValue());
-        financialAnalyticsRepository.save(entity);
-        return mapToResponse(entity);
-    }
-
     private FinancialAnalyticsResponseDTO mapToResponse(FinancialAnalytics entity) {
         FinancialAnalyticsResponseDTO dto = new FinancialAnalyticsResponseDTO();
         dto.setId(entity.getId());

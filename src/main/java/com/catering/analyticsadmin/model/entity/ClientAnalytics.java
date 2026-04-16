@@ -2,6 +2,11 @@ package com.catering.analyticsadmin.model.entity;
 
 import com.catering.analyticsadmin.model.enums.PeriodType;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -14,32 +19,40 @@ public class ClientAnalytics {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotNull(message = "Client ID is required")
     @Column(name = "client_id", nullable = false)
     private Long clientId;
 
+    @NotBlank(message = "Client name is required")
     @Column(name = "client_name", nullable = false)
     private String clientName;
 
+    @NotBlank(message = "Period type is required")
     @Enumerated(EnumType.STRING)
     @Column(name = "period_type", nullable = false)
     private PeriodType periodType;
 
+    @NotBlank(message = "Period label is required")
     @Column(name = "period_label", nullable = false)
     private String periodLabel;
 
+    @Min(0)
     @Column(name = "events_count")
     private Integer eventsCount = 0;
 
+    @DecimalMin(value = "0.0", inclusive = true)
     @Column(name = "total_spent")
     private Double totalSpent = 0.0;
 
+    @NotNull(message = "Active flag must be set")
     @Column(name = "is_active")
     private Boolean isActive = false;
 
     @Column(name = "is_returning")
     private Boolean isReturning = false;
 
-    @Column(name = "created_at")
+    @CreationTimestamp
+    @Column(name = "created_at",updatable = false)
     private LocalDateTime createdAt;
 
     public ClientAnalytics() {
