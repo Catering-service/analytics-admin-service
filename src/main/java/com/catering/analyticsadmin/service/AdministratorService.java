@@ -5,6 +5,8 @@ import com.catering.analyticsadmin.model.dto.AdministratorResponseDTO;
 import com.catering.analyticsadmin.model.dto.AdministratorUpdateDTO;
 import com.catering.analyticsadmin.model.entity.Administrator;
 import com.catering.analyticsadmin.repository.AdministratorRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,6 +25,11 @@ public class AdministratorService {
                 .stream()
                 .map(this::mapToResponse)
                 .toList();
+    }
+
+    public Page<AdministratorResponseDTO> getAll(Pageable pageable) {
+        return administratorRepository.findAll(pageable)
+                .map(this::mapToResponse);
     }
 
     public AdministratorResponseDTO getById(Long id) {

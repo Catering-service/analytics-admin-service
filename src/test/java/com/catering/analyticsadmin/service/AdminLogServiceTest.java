@@ -9,6 +9,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import static org.mockito.ArgumentMatchers.any;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -42,6 +46,45 @@ class AdminLogServiceTest {
         assertThat(results).hasSize(1);
         assertThat(results.get(0).getAdministratorId()).isEqualTo(10L);
         assertThat(results.get(0).getAction()).isEqualTo("LOGIN");
+    }
+
+    @Test
+    void getById_returnsMappedAdminLogResponse() {
+        Administrator admin = new Administrator();
+        admin.setId(10L);
+        admin.setUsername("admin1");
+
+        AdminLog adminLog = new AdminLog(admin, "LOGIN", LocalDateTime.now(), "details");
+        adminLog.setId(100L);
+
+        when(adminLogRepository.findByIdWithAdministrator(100L)).thenReturn(Optional.of(adminLog));
+
+        var result = adminLogService.getById(100L);
+
+        assertThat(result).isNotNull();
+        assertThat(result.getAdministratorId()).isEqualTo(10L);
+        assertThat(result.getAction()).isEqualTo("LOGIN");
+    }
+
+    @Test
+    void getAll_withPageable_returnsMappedPagedAdminLogResponses() {
+        Administrator admin = new Administrator();
+        admin.setId(10L);
+        admin.setUsername("admin1");
+
+        AdminLog adminLog = new AdminLog(admin, "LOGIN", LocalDateTime.now(), "details");
+        adminLog.setId(100L);
+
+        // ✅ Stub the overload that accepts a Pageable argument
+        when(adminLogRepository.findAllWithAdministrator(any(Pageable.class)))
+                .thenReturn(new PageImpl<>(List.of(adminLog)));
+
+        var results = adminLogService.getAll(Pageable.unpaged());
+        var resultList = results.getContent();
+
+        assertThat(resultList).hasSize(1);
+        assertThat(resultList.get(0).getAdministratorId()).isEqualTo(10L);
+        assertThat(resultList.get(0).getAction()).isEqualTo("LOGIN");
     }
 
     @Test

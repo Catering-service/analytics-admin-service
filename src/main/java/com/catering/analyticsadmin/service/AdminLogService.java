@@ -3,6 +3,8 @@ package com.catering.analyticsadmin.service;
 import com.catering.analyticsadmin.model.dto.AdminLogResponseDTO;
 import com.catering.analyticsadmin.model.entity.AdminLog;
 import com.catering.analyticsadmin.repository.AdminLogRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,6 +22,11 @@ public class AdminLogService {
                 .stream()
                 .map(this::mapToResponse)
                 .toList();
+    }
+
+    public Page<AdminLogResponseDTO> getAll(Pageable pageable) {
+        return adminLogRepository.findAllWithAdministrator(pageable)
+                .map(this::mapToResponse);
     }
 
     public AdminLogResponseDTO getById(Long id) {

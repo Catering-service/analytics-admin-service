@@ -10,6 +10,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -42,6 +46,29 @@ class AdministratorServiceTest {
         assertThat(responses).hasSize(1);
         assertThat(responses.get(0).getId()).isEqualTo(1L);
         assertThat(responses.get(0).getUsername()).isEqualTo("user");
+    }
+
+    @Test
+    void getAll_withPageable_returnsMappedPagedResponses() {
+        Administrator admin1 = new Administrator("user1", "user1@example.com", "hash", "John", "Doe", AdminRole.ANALYTICS);
+        admin1.setId(1L);
+        admin1.setCreatedAt(LocalDateTime.now());
+
+        Administrator admin2 = new Administrator("user2", "user2@example.com", "hash", "Jane", "Doe", AdminRole.BASIC_ADMIN);
+        admin2.setId(2L);
+        admin2.setCreatedAt(LocalDateTime.now());
+
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<Administrator> page = new PageImpl<>(List.of(admin1, admin2), pageable, 2);
+
+        when(administratorRepository.findAll(pageable)).thenReturn(page);
+
+        var responses = administratorService.getAll(pageable);
+
+        assertThat(responses.getContent()).hasSize(2);
+        assertThat(responses.getTotalElements()).isEqualTo(2);
+        assertThat(responses.getNumber()).isEqualTo(0);
+        assertThat(responses.getSize()).isEqualTo(10);
     }
 
     @Test

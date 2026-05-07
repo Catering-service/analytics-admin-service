@@ -5,6 +5,10 @@ import com.catering.analyticsadmin.model.dto.AdministratorResponseDTO;
 import com.catering.analyticsadmin.model.dto.AdministratorUpdateDTO;
 import com.catering.analyticsadmin.service.AdministratorService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,6 +27,17 @@ public class AdministratorController {
     @GetMapping
     public List<AdministratorResponseDTO> getAll() {
         return administratorService.getAll();
+    }
+
+    @GetMapping("/paginated")
+    public Page<AdministratorResponseDTO> getAllPaginated(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "asc") String sortDirection) {
+        Sort.Direction direction = Sort.Direction.fromString(sortDirection.toUpperCase());
+        Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortBy));
+        return administratorService.getAll(pageable);
     }
 
     @GetMapping("/{id}")
