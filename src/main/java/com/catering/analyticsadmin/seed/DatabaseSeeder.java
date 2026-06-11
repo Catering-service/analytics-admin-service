@@ -132,14 +132,13 @@ public class DatabaseSeeder {
             // --- EMPLOYEE ANALYTICS ---
             EmployeeAnalytics employee1 = new EmployeeAnalytics(
                     1L,
-                    "Sarah Johnson",
+                    "Sara Jozić",
                     PeriodType.MONTHLY,
                     "2026-04",
                     156,
                     89,
                     245000.0,
                     4.8,
-                    "Event Manager",
                     95.0,
                     now);
             employeeAnalyticsRepository.save(employee1);
@@ -153,7 +152,6 @@ public class DatabaseSeeder {
                     76,
                     198000.0,
                     4.6,
-                    "Catering Supervisor",
                     88.0,
                     now);
             employeeAnalyticsRepository.save(employee2);

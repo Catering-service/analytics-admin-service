@@ -39,9 +39,6 @@ public class EmployeeAnalytics {
     @Column(name = "performance_rating")
     private Double performanceRating;
 
-    @Column(name = "employee_role")
-    private String employeeRole;
-
     @Column(name = "completed_on_time_pct")
     private Double completedOnTimePct;
 
@@ -55,7 +52,7 @@ public class EmployeeAnalytics {
                              PeriodType periodType, String periodLabel,
                              Integer ticketsProcessed, Integer salesCompleted,
                              Double revenueGenerated, Double performanceRating,
-                             String employeeRole, Double completedOnTimePct,
+                             Double completedOnTimePct,
                              LocalDateTime createdAt) {
         this.employeeId = employeeId;
         this.employeeName = employeeName;
@@ -65,7 +62,6 @@ public class EmployeeAnalytics {
         this.salesCompleted = salesCompleted;
         this.revenueGenerated = revenueGenerated;
         this.performanceRating = performanceRating;
-        this.employeeRole = employeeRole;
         this.completedOnTimePct = completedOnTimePct;
         this.createdAt = createdAt;
     }
@@ -94,7 +90,6 @@ public class EmployeeAnalytics {
                 ", salesCompleted=" + salesCompleted +
                 ", revenueGenerated=" + revenueGenerated +
                 ", performanceRating=" + performanceRating +
-                ", employeeRole='" + employeeRole + '\'' +
                 ", completedOnTimePct=" + completedOnTimePct +
                 ", createdAt=" + createdAt +
                 '}';
@@ -170,14 +165,6 @@ public class EmployeeAnalytics {
 
     public void setPerformanceRating(Double performanceRating) {
         this.performanceRating = performanceRating;
-    }
-
-    public String getEmployeeRole() {
-        return employeeRole;
-    }
-
-    public void setEmployeeRole(String employeeRole) {
-        this.employeeRole = employeeRole;
     }
 
     public Double getCompletedOnTimePct() {

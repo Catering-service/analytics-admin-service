@@ -12,7 +12,6 @@ public class EmployeeAnalyticsResponseDTO {
     private Integer salesCompleted;
     private Double revenueGenerated;
     private Double performanceRating;
-    private String employeeRole;
     private Double completedOnTimePct;
 
     public EmployeeAnalyticsResponseDTO() {
@@ -88,14 +87,6 @@ public class EmployeeAnalyticsResponseDTO {
 
     public void setPerformanceRating(Double performanceRating) {
         this.performanceRating = performanceRating;
-    }
-
-    public String getEmployeeRole() {
-        return employeeRole;
-    }
-
-    public void setEmployeeRole(String employeeRole) {
-        this.employeeRole = employeeRole;
     }
 
     public Double getCompletedOnTimePct() {
