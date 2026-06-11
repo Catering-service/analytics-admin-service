@@ -56,6 +56,7 @@ public class FinancialAnalyticsService {
         dto.setPaidInvoicesCount(entity.getPaidInvoicesCount());
         dto.setUnpaidInvoicesCount(entity.getUnpaidInvoicesCount());
         dto.setAverageEventValue(entity.getAverageEventValue());
+        dto.setAverageRating(entity.getAverageRating());
         dto.setCreatedAt(entity.getCreatedAt());
         return dto;
     }

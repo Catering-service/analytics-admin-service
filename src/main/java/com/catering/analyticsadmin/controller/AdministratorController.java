@@ -45,6 +45,11 @@ public class AdministratorController {
         return administratorService.getById(id);
     }
 
+    @GetMapping("/me")
+    public AdministratorResponseDTO getCurrentAdmin(@RequestParam String email) {
+        return administratorService.getByEmail(email);
+    }
+
     @PostMapping
     public ResponseEntity<AdministratorResponseDTO> create(@Valid @RequestBody AdministratorCreateDTO request) {
         AdministratorResponseDTO response = administratorService.create(request);

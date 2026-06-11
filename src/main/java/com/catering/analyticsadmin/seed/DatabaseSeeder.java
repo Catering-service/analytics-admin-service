@@ -40,13 +40,26 @@ public class DatabaseSeeder {
 
             // --- ADMIN ---
             Administrator admin = new Administrator("sysadmin",
-                    "admin@eliteevents.ba",
-                    "$2a$10$examplehash",
+                    "admin@catering.ba",
+                    "$2a$10$27mqjrCsX0N7sj/zbVSxqOORAO6W8NIHhpu1ecoiqK03CZdv7Bys2",
                     "System",
                     "Admin",
-                    AdminRole.SUPERADMIN);
+                    AdminRole.BASIC_ADMIN);
+            admin.setLastLoginAt(LocalDateTime.now().minusDays(3).minusHours(3).minusMinutes(17));
 
             admin = administratorRepository.save(admin);
+
+            Administrator superadmin = new Administrator(
+                    "superadmin",
+                    "superadmin@catering.ba",
+                    "$2a$10$27mqjrCsX0N7sj/zbVSxqOORAO6W8NIHhpu1ecoiqK03CZdv7Bys2",
+                    "Super",
+                    "Admin",
+                    AdminRole.SUPERADMIN
+            );
+            superadmin.setLastLoginAt(LocalDateTime.now().minusDays(4));
+            superadmin = administratorRepository.save(superadmin);
+
 
             // --- OFFER TYPES ---
             OfferType decoration = new OfferType("Decoration");
@@ -126,6 +139,8 @@ public class DatabaseSeeder {
                     89,
                     245000.0,
                     4.8,
+                    "Event Manager",
+                    95.0,
                     now);
             employeeAnalyticsRepository.save(employee1);
 
@@ -138,6 +153,8 @@ public class DatabaseSeeder {
                     76,
                     198000.0,
                     4.6,
+                    "Catering Supervisor",
+                    88.0,
                     now);
             employeeAnalyticsRepository.save(employee2);
 
@@ -197,6 +214,7 @@ public class DatabaseSeeder {
                     120,
                     15,
                     3344.0,
+                    4.7,
                     now);
             financialAnalyticsRepository.save(financialAnalytics);
 

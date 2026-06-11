@@ -1,13 +1,17 @@
 package com.catering.analyticsadmin.service;
 
+import com.catering.analyticsadmin.feign.AuthServiceClient;
 import com.catering.analyticsadmin.model.dto.AdministratorCreateDTO;
 import com.catering.analyticsadmin.model.dto.AdministratorResponseDTO;
 import com.catering.analyticsadmin.model.dto.AdministratorUpdateDTO;
+import com.catering.analyticsadmin.model.dto.external.AuthUserCreateRequest;
 import com.catering.analyticsadmin.model.entity.Administrator;
 import com.catering.analyticsadmin.repository.AdministratorRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -15,9 +19,13 @@ import java.util.List;
 public class AdministratorService {
 
     private final AdministratorRepository administratorRepository;
+    private final AuthServiceClient authServiceClient;
+    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
-    public AdministratorService(AdministratorRepository administratorRepository) {
+    public AdministratorService(AdministratorRepository administratorRepository,
+                                AuthServiceClient authServiceClient) {
         this.administratorRepository = administratorRepository;
+        this.authServiceClient = authServiceClient;
     }
 
     public List<AdministratorResponseDTO> getAll() {
@@ -38,6 +46,13 @@ public class AdministratorService {
         return mapToResponse(administrator);
     }
 
+    public AdministratorResponseDTO getByEmail(String email) {
+        Administrator administrator = administratorRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Administrator not found"));
+        return mapToResponse(administrator);
+    }
+
+    @Transactional
     public AdministratorResponseDTO create(AdministratorCreateDTO request) {
         if (administratorRepository.existsByUsername(request.getUsername())) {
             throw new RuntimeException("Username already exists");
@@ -50,13 +65,28 @@ public class AdministratorService {
         Administrator administrator = new Administrator(
                 request.getUsername(),
                 request.getEmail(),
-                request.getPasswordHash(),
+                passwordEncoder.encode(request.getPassword()),
                 request.getFirstName(),
                 request.getLastName(),
                 request.getRole()
         );
 
         administrator = administratorRepository.save(administrator);
+
+        // Sync admin to auth-service
+        try {
+            AuthUserCreateRequest authRequest = new AuthUserCreateRequest(
+                    request.getFirstName(),
+                    request.getLastName(),
+                    request.getEmail(),
+                    request.getPassword(),
+                    "ADMIN"
+            );
+            authServiceClient.createUser(authRequest);
+        } catch (Exception e) {
+            System.err.println("Failed to sync admin to auth-service: " + e.getMessage());
+        }
+
         return mapToResponse(administrator);
     }
 

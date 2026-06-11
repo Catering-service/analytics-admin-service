@@ -15,6 +15,7 @@ public class FinancialAnalyticsResponseDTO {
     private Integer paidInvoicesCount;
     private Integer unpaidInvoicesCount;
     private Double averageEventValue;
+    private Double averageRating;
     private LocalDateTime createdAt;
 
     public FinancialAnalyticsResponseDTO() {
@@ -90,6 +91,14 @@ public class FinancialAnalyticsResponseDTO {
 
     public void setAverageEventValue(Double averageEventValue) {
         this.averageEventValue = averageEventValue;
+    }
+
+    public Double getAverageRating() {
+        return averageRating;
+    }
+
+    public void setAverageRating(Double averageRating) {
+        this.averageRating = averageRating;
     }
 
     public LocalDateTime getCreatedAt() {

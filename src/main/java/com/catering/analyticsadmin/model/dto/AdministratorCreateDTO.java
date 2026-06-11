@@ -16,6 +16,9 @@ public class AdministratorCreateDTO {
     @NotBlank(message = "Password hash is required")
     private String passwordHash;
 
+    @NotBlank(message = "Password is required")
+    private String password;
+
     @NotBlank(message = "First name is required")
     private String firstName;
 
@@ -47,6 +50,14 @@ public class AdministratorCreateDTO {
 
     public void setPasswordHash(String passwordHash) {
         this.passwordHash = passwordHash;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public String getFirstName() {

@@ -39,6 +39,9 @@ public class FinancialAnalytics {
     @Column(name = "average_event_value")
     private Double averageEventValue = 0.0;
 
+    @Column(name = "average_rating")
+    private Double averageRating;
+
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
@@ -49,6 +52,7 @@ public class FinancialAnalytics {
                               Double totalRevenue, Double totalExpenses,
                               Double netProfit, Integer paidInvoicesCount,
                               Integer unpaidInvoicesCount, Double averageEventValue,
+                              Double averageRating,
                               LocalDateTime createdAt) {
         this.periodType = periodType;
         this.periodLabel = periodLabel;
@@ -58,6 +62,7 @@ public class FinancialAnalytics {
         this.paidInvoicesCount = paidInvoicesCount;
         this.unpaidInvoicesCount = unpaidInvoicesCount;
         this.averageEventValue = averageEventValue;
+        this.averageRating = averageRating;
         this.createdAt = createdAt;
     }
 
@@ -85,6 +90,7 @@ public class FinancialAnalytics {
                 ", paidInvoicesCount=" + paidInvoicesCount +
                 ", unpaidInvoicesCount=" + unpaidInvoicesCount +
                 ", averageEventValue=" + averageEventValue +
+                ", averageRating=" + averageRating +
                 ", createdAt=" + createdAt +
                 '}';
     }
@@ -159,6 +165,14 @@ public class FinancialAnalytics {
 
     public void setAverageEventValue(Double averageEventValue) {
         this.averageEventValue = averageEventValue;
+    }
+
+    public Double getAverageRating() {
+        return averageRating;
+    }
+
+    public void setAverageRating(Double averageRating) {
+        this.averageRating = averageRating;
     }
 
     public LocalDateTime getCreatedAt() {

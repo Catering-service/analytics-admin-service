@@ -38,7 +38,8 @@ public class EmployeeAnalyticsService {
         dto.setSalesCompleted(entity.getSalesCompleted());
         dto.setRevenueGenerated(entity.getRevenueGenerated());
         dto.setPerformanceRating(entity.getPerformanceRating());
-
+        dto.setEmployeeRole(entity.getEmployeeRole());
+        dto.setCompletedOnTimePct(entity.getCompletedOnTimePct());
         return dto;
     }
 }
