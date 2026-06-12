@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Feign client for user-event-service.
@@ -30,6 +31,9 @@ public interface UserEventServiceClient {
 
     @GetMapping("/api/employees")
     List<UserEmployeeDTO> getAllEmployees();
+
+    @GetMapping("/api/employees/{employeeId}/average-rating")
+    Map<String, Object> getEmployeeAverageRating(@PathVariable Long employeeId);
 
     // --- Clients ---
 

@@ -202,26 +202,43 @@ public class DatabaseSeeder {
                     now);
             servicePopularityRepository.save(service2);
 
-            // --- FINANCIAL ANALYTICS ---
-            FinancialAnalytics financialAnalytics = new FinancialAnalytics(
-                    PeriodType.MONTHLY,
-                    "2026-04",
-                    739000.0,
-                    420000.0,
-                    319000.0,
-                    120,
-                    15,
-                    3344.0,
-                    4.7,
-                    now);
-            financialAnalyticsRepository.save(financialAnalytics);
+            // --- FINANCIAL ANALYTICS (monthly, January–May 2026) ---
+            FinancialAnalytics faJan = new FinancialAnalytics(
+                    PeriodType.MONTHLY, "2026-01",
+                    520000.0, 310000.0, 210000.0, 85, 10, 2800.0, 4.5, now);
+            financialAnalyticsRepository.save(faJan);
 
-            // --- REVENUE TREND ---
-            RevenueTrend revenueTrend1 = new RevenueTrend(2026, 1, 50000.0, 20, now);
+            FinancialAnalytics faFeb = new FinancialAnalytics(
+                    PeriodType.MONTHLY, "2026-02",
+                    480000.0, 290000.0, 190000.0, 72, 8, 3100.0, 4.6, now);
+            financialAnalyticsRepository.save(faFeb);
+
+            FinancialAnalytics faMar = new FinancialAnalytics(
+                    PeriodType.MONTHLY, "2026-03",
+                    610000.0, 350000.0, 260000.0, 98, 12, 3400.0, 4.8, now);
+            financialAnalyticsRepository.save(faMar);
+
+            FinancialAnalytics faApr = new FinancialAnalytics(
+                    PeriodType.MONTHLY, "2026-04",
+                    739000.0, 420000.0, 319000.0, 120, 15, 3344.0, 4.7, now);
+            financialAnalyticsRepository.save(faApr);
+
+            FinancialAnalytics faMay = new FinancialAnalytics(
+                    PeriodType.MONTHLY, "2026-05",
+                    680000.0, 390000.0, 290000.0, 105, 11, 3600.0, 4.4, now);
+            financialAnalyticsRepository.save(faMay);
+
+            // --- REVENUE TREND (January–May 2026) ---
+            RevenueTrend revenueTrend1 = new RevenueTrend(2026, 1, 520000.0, 95, now);
             revenueTrendRepository.save(revenueTrend1);
-
-            RevenueTrend revenueTrend2 = new RevenueTrend(2026, 2, 54000.0, 22, now);
+            RevenueTrend revenueTrend2 = new RevenueTrend(2026, 2, 480000.0, 80, now);
             revenueTrendRepository.save(revenueTrend2);
+            RevenueTrend revenueTrend3 = new RevenueTrend(2026, 3, 610000.0, 110, now);
+            revenueTrendRepository.save(revenueTrend3);
+            RevenueTrend revenueTrend4 = new RevenueTrend(2026, 4, 739000.0, 135, now);
+            revenueTrendRepository.save(revenueTrend4);
+            RevenueTrend revenueTrend5 = new RevenueTrend(2026, 5, 680000.0, 116, now);
+            revenueTrendRepository.save(revenueTrend5);
 
             System.out.println("=== DATA SEEDER FINISHED ===");
         };

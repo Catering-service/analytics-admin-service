@@ -204,7 +204,7 @@ public class AnalyticsAggregationScheduler {
                         ticketsProcessed,
                         0, // salesCompleted — no sales tracking yet
                         revenueGenerated,
-                        0.0, // performanceRating — not yet implemented
+                        fetchEmployeeRating(emp.id()), // performanceRating from real data
                         0.0, // completedOnTimePct — not yet implemented
                         LocalDateTime.now()
                 );
@@ -409,6 +409,17 @@ public class AnalyticsAggregationScheduler {
         } catch (Exception e) {
             log.warn("Failed to fetch data: {}", e.getMessage());
             return List.of();
+        }
+    }
+
+    private double fetchEmployeeRating(Long employeeId) {
+        try {
+            Map<String, Object> avg = userEventClient.getEmployeeAverageRating(employeeId);
+            Object rating = avg.get("averageRating");
+            return rating instanceof Number ? ((Number) rating).doubleValue() : 0.0;
+        } catch (Exception e) {
+            log.debug("Could not fetch rating for employee {}: {}", employeeId, e.getMessage());
+            return 0.0;
         }
     }
 
