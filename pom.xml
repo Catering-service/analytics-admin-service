@@ -97,6 +97,12 @@
             <version>1.5.5.Final</version>
         </dependency>
 
+        <!-- Spring Security -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+
         <!-- Testing Framework (Version managed automatically by parent) -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
