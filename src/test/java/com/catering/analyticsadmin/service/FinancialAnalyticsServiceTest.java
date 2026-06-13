@@ -28,7 +28,7 @@ class FinancialAnalyticsServiceTest {
 
     @Test
     void getByPeriodType_returnsMappedResponses() {
-        FinancialAnalytics entity = new FinancialAnalytics(PeriodType.MONTHLY, "May 2026", 10000.0, 7000.0, 3000.0, 20, 5, 500.0, LocalDateTime.now());
+        FinancialAnalytics entity = new FinancialAnalytics(PeriodType.MONTHLY, "May 2026", 10000.0, 7000.0, 3000.0, 20, 5, 500.0, 4.2, LocalDateTime.now());
         entity.setId(1L);
 
         when(financialAnalyticsRepository.findByPeriodType(PeriodType.MONTHLY)).thenReturn(List.of(entity));

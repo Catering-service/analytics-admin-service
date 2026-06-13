@@ -28,7 +28,7 @@ class EmployeeAnalyticsServiceTest {
 
     @Test
     void getAllEmployeeAnalytics_returnsMappedEntities() {
-        EmployeeAnalytics entity = new EmployeeAnalytics(99L, "Jane", PeriodType.YEARLY, "2026-W18", 15, 7, 3500.0, 4.8, LocalDateTime.now());
+        EmployeeAnalytics entity = new EmployeeAnalytics(99L, "Jane", PeriodType.YEARLY, "2026-W18", 15, 7, 3500.0, 4.8, 92.0, LocalDateTime.now());
         entity.setId(2L);
 
         when(employeeAnalyticsRepository.findAll()).thenReturn(List.of(entity));

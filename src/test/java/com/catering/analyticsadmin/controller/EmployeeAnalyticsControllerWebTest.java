@@ -31,7 +31,7 @@ class EmployeeAnalyticsControllerWebTest {
 
     @Test
     void getAllReturnsEmployeeAnalyticsList() throws Exception {
-        EmployeeAnalytics analytics = new EmployeeAnalytics(100L, "John Doe", PeriodType.MONTHLY, "2026-05", 20, 8, 4000.0, 4.5, LocalDateTime.now());
+        EmployeeAnalytics analytics = new EmployeeAnalytics(100L, "John Doe", PeriodType.MONTHLY, "2026-05", 20, 8, 4000.0, 4.5, 90.0, LocalDateTime.now());
         analytics.setId(1L);
 
         when(employeeAnalyticsService.getAllEmployeeAnalytics()).thenReturn(List.of(analytics));
@@ -44,7 +44,7 @@ class EmployeeAnalyticsControllerWebTest {
 
     @Test
     void getByIdReturnsEmployeeAnalytics() throws Exception {
-        EmployeeAnalytics analytics = new EmployeeAnalytics(101L, "Jane Smith", PeriodType.WEEKLY, "2026-W18", 12, 5, 2500.0, 4.8, LocalDateTime.now());
+        EmployeeAnalytics analytics = new EmployeeAnalytics(101L, "Jane Smith", PeriodType.WEEKLY, "2026-W18", 12, 5, 2500.0, 4.8, 85.0, LocalDateTime.now());
         analytics.setId(2L);
 
         when(employeeAnalyticsService.getEmployeeAnalytics(2L)).thenReturn(analytics);
