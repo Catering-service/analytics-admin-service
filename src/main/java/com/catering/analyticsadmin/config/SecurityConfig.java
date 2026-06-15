@@ -25,8 +25,14 @@ public class SecurityConfig {
                 .addFilterBefore(headerAuthFilter, AnonymousAuthenticationFilter.class)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // CORS
-                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll() // Swagger UI
-                        .requestMatchers("/actuator/**").permitAll() // Eureka health checks
+                        .requestMatchers(
+                                "/actuator/health",
+                                "/actuator/info",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html",
+                                "/v3/api-docs/**"
+                        ).permitAll()
+
                         .requestMatchers("/api/administrators/**").hasRole("ADMIN")
                         .requestMatchers("/api/admin-logs/**").hasRole("ADMIN")
                         .requestMatchers("/api/ai-interactions/**").hasAnyRole("EMPLOYEE", "ADMIN")
