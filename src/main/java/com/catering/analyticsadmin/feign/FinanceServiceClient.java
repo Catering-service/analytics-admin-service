@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  * Feign client for finance-service.
- * Uses Eureka service discovery — no hardcoded URLs.
+ * Uses Eureka service discovery - no hardcoded URLs.
  * Returns PageResponse to handle paginated endpoints from finance-service.
  */
 @FeignClient(name = "finance-service")

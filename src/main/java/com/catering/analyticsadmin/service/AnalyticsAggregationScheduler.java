@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
  * Scheduled service that periodically fetches data from other microservices,
  * aggregates it, and stores the results in analytics-admin's database.
  *
- * Runs daily at 2:00 AM. Each aggregation method is idempotent —
+ * Runs daily at 2:00 AM. Each aggregation method is idempotent -
  * skips if data for the current period already exists.
  */
 @Service
@@ -147,7 +147,7 @@ public class AnalyticsAggregationScheduler {
                     (int) paidCount,
                     (int) unpaidCount,
                     avgEventValue,
-                    0.0, // averageRating — not yet implemented
+                    0.0, // averageRating - not yet implemented
                     LocalDateTime.now()
             );
             financialRepo.save(fa);
@@ -202,10 +202,10 @@ public class AnalyticsAggregationScheduler {
                         PeriodType.MONTHLY,
                         periodLabel,
                         ticketsProcessed,
-                        0, // salesCompleted — no sales tracking yet
+                        0, // salesCompleted - no sales tracking yet
                         revenueGenerated,
                         fetchEmployeeRating(emp.id()), // performanceRating from real data
-                        0.0, // completedOnTimePct — not yet implemented
+                        0.0, // completedOnTimePct - not yet implemented
                         LocalDateTime.now()
                 );
                 employeeRepo.save(ea);
@@ -319,7 +319,7 @@ public class AnalyticsAggregationScheduler {
     private void aggregateServicePopularity() {
         YearMonth now = YearMonth.now();
         String periodLabel = now.toString();
-        // Check using all records — simple approach
+        // Check using all records - simple approach
         boolean exists = servicePopularityRepo.findAll().stream()
                 .anyMatch(s -> periodLabel.equals(s.getPeriodLabel()));
         if (!exists) {
@@ -394,7 +394,7 @@ public class AnalyticsAggregationScheduler {
     }
 
     // ──────────────────────────────────────────────
-    // Safe fetch — returns empty list on failure
+    // Safe fetch - returns empty list on failure
     // ──────────────────────────────────────────────
 
     @FunctionalInterface

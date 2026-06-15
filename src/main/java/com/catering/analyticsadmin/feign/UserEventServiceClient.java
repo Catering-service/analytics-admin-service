@@ -11,7 +11,7 @@ import java.util.Map;
 
 /**
  * Feign client for user-event-service.
- * Uses Eureka service discovery — no hardcoded URLs.
+ * Uses Eureka service discovery - no hardcoded URLs.
  */
 @FeignClient(name = "user-event-service")
 public interface UserEventServiceClient {
