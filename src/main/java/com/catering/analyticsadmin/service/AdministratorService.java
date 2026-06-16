@@ -105,11 +105,14 @@ public class AdministratorService {
         return mapToResponse(administrator);
     }
 
+    @Transactional
     public void delete(Long id) {
-        if (!administratorRepository.existsById(id)) {
-            throw new RuntimeException("Administrator not found");
-        }
-        administratorRepository.deleteById(id);
+        Administrator administrator = administratorRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Administrator not found"));
+
+        // Soft delete: set active to false instead of removing from DB (archive purposes)
+        administrator.setActive(false);
+        administratorRepository.save(administrator);
     }
 
     private AdministratorResponseDTO mapToResponse(Administrator administrator) {

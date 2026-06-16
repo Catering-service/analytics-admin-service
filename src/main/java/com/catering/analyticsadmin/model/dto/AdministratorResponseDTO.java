@@ -14,6 +14,7 @@ public class AdministratorResponseDTO {
     private Boolean active;
     private LocalDateTime createdAt;
     private LocalDateTime lastLoginAt;
+    private Long authServiceId;
 
     public Long getId() {
         return id;
