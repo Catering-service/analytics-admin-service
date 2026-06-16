@@ -84,7 +84,7 @@ public class AdministratorService {
             );
             authServiceClient.createUser(authRequest);
         } catch (Exception e) {
-            System.err.println("Failed to sync admin to auth-service: " + e.getMessage());
+            // System.err.println("Failed to sync admin to auth-service: " + e.getMessage());
         }
 
         return mapToResponse(administrator);
