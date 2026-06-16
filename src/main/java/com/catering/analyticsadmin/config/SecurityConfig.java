@@ -35,7 +35,7 @@ public class SecurityConfig {
 
                         .requestMatchers("/api/administrators/**").hasRole("ADMIN")
                         .requestMatchers("/api/admin-logs/**").hasRole("ADMIN")
-                        .requestMatchers("/api/ai-interactions/**").hasAnyRole("EMPLOYEE", "ADMIN")
+                        .requestMatchers("/api/ai-interactions/**").hasAnyRole("EMPLOYEE", "ADMIN", "CLIENT", "PARTNER")
                         .requestMatchers("/api/client-analytics/**").hasAnyRole("EMPLOYEE", "ADMIN")
                         .requestMatchers("/api/employee-analytics/**").hasRole("ADMIN")
                         .requestMatchers("/api/financial-analytics/**").hasRole("ADMIN")
