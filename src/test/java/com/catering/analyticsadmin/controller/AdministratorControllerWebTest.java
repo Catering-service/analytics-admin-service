@@ -2,19 +2,18 @@ package com.catering.analyticsadmin.controller;
 
 import com.catering.analyticsadmin.model.dto.AdministratorCreateDTO;
 import com.catering.analyticsadmin.model.dto.AdministratorResponseDTO;
-import com.catering.analyticsadmin.model.entity.Administrator;
 import com.catering.analyticsadmin.model.enums.AdminRole;
 import com.catering.analyticsadmin.service.AdministratorService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -84,10 +83,10 @@ class AdministratorControllerWebTest {
         when(administratorService.getAll(any())).thenReturn(page);
 
         mockMvc.perform(get("/api/administrators/paginated")
-                .param("page", "0")
-                .param("size", "10")
-                .param("sortBy", "id")
-                .param("sortDirection", "asc"))
+                        .param("page", "0")
+                        .param("size", "10")
+                        .param("sortBy", "id")
+                        .param("sortDirection", "asc"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content[0].username").value("admin-user-1"))
                 .andExpect(jsonPath("$.content[1].username").value("admin-user-2"))
@@ -103,6 +102,7 @@ class AdministratorControllerWebTest {
         AdministratorCreateDTO request = new AdministratorCreateDTO();
         request.setUsername("new-admin");
         request.setEmail("new-admin@example.com");
+        request.setPassword("securepassword");
         request.setPasswordHash("securepassword");
         request.setFirstName("New");
         request.setLastName("Admin");

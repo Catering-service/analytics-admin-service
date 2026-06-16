@@ -1,7 +1,6 @@
 package com.catering.analyticsadmin.service;
 
 import com.catering.analyticsadmin.model.dto.AdministratorCreateDTO;
-import com.catering.analyticsadmin.model.dto.AdministratorUpdateDTO;
 import com.catering.analyticsadmin.model.entity.Administrator;
 import com.catering.analyticsadmin.model.enums.AdminRole;
 import com.catering.analyticsadmin.repository.AdministratorRepository;
@@ -85,7 +84,7 @@ class AdministratorServiceTest {
         AdministratorCreateDTO request = new AdministratorCreateDTO();
         request.setUsername("user");
         request.setEmail("user@example.com");
-        request.setPasswordHash("hash");
+        request.setPassword("hash");
         request.setFirstName("John");
         request.setLastName("Doe");
         request.setRole(AdminRole.ANALYTICS);
@@ -99,10 +98,11 @@ class AdministratorServiceTest {
 
     @Test
     void delete_whenNotFound_throws() {
-        when(administratorRepository.existsById(99L)).thenReturn(false);
+        when(administratorRepository.findById(99L)).thenReturn(Optional.empty());
 
         var exception = assertThrows(RuntimeException.class, () -> administratorService.delete(99L));
 
         assertThat(exception).hasMessageContaining("Administrator not found");
+        verify(administratorRepository, never()).save(any());
     }
 }
