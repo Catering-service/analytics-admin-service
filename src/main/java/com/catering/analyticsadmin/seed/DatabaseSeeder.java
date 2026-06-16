@@ -2,7 +2,6 @@ package com.catering.analyticsadmin.seed;
 
 import com.catering.analyticsadmin.model.entity.*;
 import com.catering.analyticsadmin.model.enums.AdminRole;
-import com.catering.analyticsadmin.model.enums.PeriodType;
 import com.catering.analyticsadmin.repository.*;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
@@ -20,12 +19,7 @@ public class DatabaseSeeder {
             OfferTypeRepository offerTypeRepository,
             PartnerOfferRepository partnerOfferRepository,
             AdminLogRepository adminLogRepository,
-            AiInteractionRepository aiInteractionRepository,
-            EmployeeAnalyticsRepository employeeAnalyticsRepository,
-            ClientAnalyticsRepository clientAnalyticsRepository,
-            ServicePopularityRepository servicePopularityRepository,
-            FinancialAnalyticsRepository financialAnalyticsRepository,
-            RevenueTrendRepository revenueTrendRepository
+            AiInteractionRepository aiInteractionRepository
     ) {
         return args -> {
 
@@ -120,7 +114,7 @@ public class DatabaseSeeder {
             AdminLog adminLog = new AdminLog(admin, "CREATE_PARTNER", now, "Initial partner created.");
             adminLogRepository.save(adminLog);
 
-            // --- AI INTERACTIONS ---
+            // --- AI INTERACTIONS (demo) ---
             AiInteraction aiInteraction = new AiInteraction(
                     101L,
                     "sess-001",
@@ -129,116 +123,9 @@ public class DatabaseSeeder {
                     now);
             aiInteractionRepository.save(aiInteraction);
 
-            // --- EMPLOYEE ANALYTICS ---
-            EmployeeAnalytics employee1 = new EmployeeAnalytics(
-                    1L,
-                    "Sara Jozić",
-                    PeriodType.MONTHLY,
-                    "2026-04",
-                    156,
-                    89,
-                    245000.0,
-                    4.8,
-                    95.0,
-                    now);
-            employeeAnalyticsRepository.save(employee1);
-
-            EmployeeAnalytics employee2 = new EmployeeAnalytics(
-                    2L,
-                    "Michael Chen",
-                    PeriodType.MONTHLY,
-                    "2026-04",
-                    142,
-                    76,
-                    198000.0,
-                    4.6,
-                    88.0,
-                    now);
-            employeeAnalyticsRepository.save(employee2);
-
-            // --- CLIENT ANALYTICS ---
-            ClientAnalytics client1 = new ClientAnalytics(
-                    101L,
-                    "Client A",
-                    PeriodType.MONTHLY,
-                    "2026-04",
-                    5,
-                    12000.0,
-                    true,
-                    true,
-                    now);
-            clientAnalyticsRepository.save(client1);
-
-            ClientAnalytics client2 = new ClientAnalytics(
-                    102L,
-                    "Client B",
-                    PeriodType.MONTHLY,
-                    "2026-04",
-                    1,
-                    3200.0,
-                    true,
-                    false,
-                    now);
-            clientAnalyticsRepository.save(client2);
-
-            // --- SERVICE POPULARITY ---
-            ServicePopularity service1 = new ServicePopularity(
-                    "Wedding Catering",
-                    "Catering",
-                    PeriodType.MONTHLY,
-                    "2026-04",
-                    145,
-                    320000.0,
-                    now);
-            servicePopularityRepository.save(service1);
-
-            ServicePopularity service2 = new ServicePopularity(
-                    "Decoration Package",
-                    "Decoration",
-                    PeriodType.MONTHLY,
-                    "2026-04",
-                    76,
-                    95000.0,
-                    now);
-            servicePopularityRepository.save(service2);
-
-            // --- FINANCIAL ANALYTICS (monthly, January–May 2026) ---
-            FinancialAnalytics faJan = new FinancialAnalytics(
-                    PeriodType.MONTHLY, "2026-01",
-                    520000.0, 310000.0, 210000.0, 85, 10, 2800.0, 4.5, now);
-            financialAnalyticsRepository.save(faJan);
-
-            FinancialAnalytics faFeb = new FinancialAnalytics(
-                    PeriodType.MONTHLY, "2026-02",
-                    480000.0, 290000.0, 190000.0, 72, 8, 3100.0, 4.6, now);
-            financialAnalyticsRepository.save(faFeb);
-
-            FinancialAnalytics faMar = new FinancialAnalytics(
-                    PeriodType.MONTHLY, "2026-03",
-                    610000.0, 350000.0, 260000.0, 98, 12, 3400.0, 4.8, now);
-            financialAnalyticsRepository.save(faMar);
-
-            FinancialAnalytics faApr = new FinancialAnalytics(
-                    PeriodType.MONTHLY, "2026-04",
-                    739000.0, 420000.0, 319000.0, 120, 15, 3344.0, 4.7, now);
-            financialAnalyticsRepository.save(faApr);
-
-            FinancialAnalytics faMay = new FinancialAnalytics(
-                    PeriodType.MONTHLY, "2026-05",
-                    680000.0, 390000.0, 290000.0, 105, 11, 3600.0, 4.4, now);
-            financialAnalyticsRepository.save(faMay);
-
-            // --- REVENUE TREND (January–May 2026) ---
-            RevenueTrend revenueTrend1 = new RevenueTrend(2026, 1, 520000.0, 95, now);
-            revenueTrendRepository.save(revenueTrend1);
-            RevenueTrend revenueTrend2 = new RevenueTrend(2026, 2, 480000.0, 80, now);
-            revenueTrendRepository.save(revenueTrend2);
-            RevenueTrend revenueTrend3 = new RevenueTrend(2026, 3, 610000.0, 110, now);
-            revenueTrendRepository.save(revenueTrend3);
-            RevenueTrend revenueTrend4 = new RevenueTrend(2026, 4, 739000.0, 135, now);
-            revenueTrendRepository.save(revenueTrend4);
-            RevenueTrend revenueTrend5 = new RevenueTrend(2026, 5, 680000.0, 116, now);
-            revenueTrendRepository.save(revenueTrend5);
+            // NOTE: Analytics data (employee, client, financial, revenue, service popularity)
+            // is NOT seeded — it is aggregated from real system data by the
+            // AnalyticsAggregationScheduler (runs daily at 2 AM, or manually via /api/analytics/refresh).
 
             System.out.println("=== DATA SEEDER FINISHED ===");
         };

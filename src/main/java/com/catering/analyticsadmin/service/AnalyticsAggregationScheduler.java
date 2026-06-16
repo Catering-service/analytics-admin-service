@@ -15,6 +15,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 /**
@@ -29,6 +30,7 @@ public class AnalyticsAggregationScheduler {
 
     private static final Logger log = LoggerFactory.getLogger(AnalyticsAggregationScheduler.class);
     private static final int PAGE_SIZE = 1000;
+    private static final int MAX_PAGES = 50; // safety cap: 50,000 records max
 
     private final UserEventServiceClient userEventClient;
     private final FinanceServiceClient financeClient;
@@ -55,32 +57,44 @@ public class AnalyticsAggregationScheduler {
         this.servicePopularityRepo = servicePopularityRepo;
     }
 
+    private final AtomicBoolean aggregationInProgress = new AtomicBoolean(false);
+
     // ──────────────────────────────────────────────
     // Scheduling & manual trigger
     // ──────────────────────────────────────────────
 
     @Scheduled(cron = "0 0 2 * * *") // 2:00 AM every day
     public void runDailyAggregation() {
-        triggerAggregation(false);
+        if (!aggregationInProgress.compareAndSet(false, true)) {
+            log.warn("Scheduled aggregation skipped — previous run still in progress");
+            return;
+        }
+        try {
+            triggerAggregation(false);
+        } finally {
+            aggregationInProgress.set(false);
+        }
     }
 
     /**
      * Public entry point for manual refresh.
      * When forceRefresh=true, deletes current-period records first so they are re-created.
+     * @return true if aggregation started, false if already in progress
      */
-    public void triggerAggregation(boolean forceRefresh) {
+    public boolean triggerAggregation(boolean forceRefresh) {
         if (forceRefresh) {
             String periodLabel = YearMonth.now().toString();
             log.info("Force refresh: clearing existing analytics data for period {}", periodLabel);
             deleteByPeriod(periodLabel);
         }
         log.info("=== Starting analytics aggregation (force={}) ===", forceRefresh);
-        try { aggregateFinancialAnalytics(); } catch (Exception e) { log.error("Financial analytics aggregation failed", e); }
         try { aggregateEmployeeAnalytics(); } catch (Exception e) { log.error("Employee analytics aggregation failed", e); }
+        try { aggregateFinancialAnalytics(); } catch (Exception e) { log.error("Financial analytics aggregation failed", e); }
         try { aggregateClientAnalytics(); } catch (Exception e) { log.error("Client analytics aggregation failed", e); }
         try { aggregateRevenueTrend(); } catch (Exception e) { log.error("Revenue trend aggregation failed", e); }
         try { aggregateServicePopularity(); } catch (Exception e) { log.error("Service popularity aggregation failed", e); }
         log.info("=== Analytics aggregation complete ===");
+        return true;
     }
 
     private void deleteByPeriod(String periodLabel) {
@@ -138,6 +152,13 @@ public class AnalyticsAggregationScheduler {
             double avgEventValue = paidCount > 0 ? totalRevenue / paidCount : 0;
             double netProfit = totalRevenue - totalExpenses;
 
+            // Compute average employee rating for this month
+            double averageRating = employeeRepo.findAll().stream()
+                    .filter(e -> periodLabel.equals(e.getPeriodLabel()) && e.getPerformanceRating() != null && e.getPerformanceRating() > 0)
+                    .mapToDouble(EmployeeAnalytics::getPerformanceRating)
+                    .average()
+                    .orElse(0.0);
+
             FinancialAnalytics fa = new FinancialAnalytics(
                     PeriodType.MONTHLY,
                     periodLabel,
@@ -147,7 +168,7 @@ public class AnalyticsAggregationScheduler {
                     (int) paidCount,
                     (int) unpaidCount,
                     avgEventValue,
-                    0.0, // averageRating - not yet implemented
+                    Math.round(averageRating * 10.0) / 10.0,
                     LocalDateTime.now()
             );
             financialRepo.save(fa);
@@ -281,7 +302,7 @@ public class AnalyticsAggregationScheduler {
         boolean exists = revenueRepo.findAll().stream()
                 .anyMatch(r -> r.getYear() == year && r.getMonth() == month);
         if (!exists) {
-            log.info("Aggregating revenue trend for {}-{:02d}", year, month);
+            log.info("Aggregating revenue trend for {}", now);
 
             List<UserEventDTO> events = safeFetch(userEventClient::getAllEvents);
             List<FinanceInvoiceDTO> invoices = fetchAllInvoices();
@@ -332,7 +353,9 @@ public class AnalyticsAggregationScheduler {
             for (UserMenuDTO menu : menus) {
                 if (menu.menuDishes() != null) {
                     for (UserDishDTO dish : menu.menuDishes()) {
-                        dishMap.compute(dish.name(), (k, v) -> {
+                        String dishName = dish.name();
+                        if (dishName == null || dishName.isBlank()) continue;
+                        dishMap.compute(dishName, (k, v) -> {
                             if (v == null) {
                                 return new DishAgg(dish.dishType(), dish.price(), 1);
                             }
@@ -366,30 +389,39 @@ public class AnalyticsAggregationScheduler {
 
     private List<FinanceInvoiceDTO> fetchAllInvoices() {
         List<FinanceInvoiceDTO> all = new ArrayList<>();
-        int page = 0;
-        PageResponse<FinanceInvoiceDTO> response;
-        do {
-            response = financeClient.getInvoices(page, PAGE_SIZE);
-            if (response != null && response.content() != null) {
-                all.addAll(response.content());
+        for (int page = 0; page < MAX_PAGES; page++) {
+            try {
+                PageResponse<FinanceInvoiceDTO> response = financeClient.getInvoices(page, PAGE_SIZE);
+                if (response == null) break;
+                if (response.content() != null) {
+                    all.addAll(response.content());
+                }
+                if (!response.hasNext()) break;
+            } catch (Exception e) {
+                log.error("Failed to fetch invoices page {}: {}", page, e.getMessage(), e);
+                throw new RuntimeException("Failed to fetch invoices — aggregation aborted to avoid incomplete data", e);
             }
-            page++;
-        } while (response != null && response.hasNext());
-        log.debug("Fetched {} invoices", all.size());
+        }
+        log.info("Fetched {} invoices across pages", all.size());
         return all;
     }
 
     private List<FinancePreInvoiceDTO> fetchAllPreInvoices() {
         List<FinancePreInvoiceDTO> all = new ArrayList<>();
-        int page = 0;
-        PageResponse<FinancePreInvoiceDTO> response;
-        do {
-            response = financeClient.getPreInvoices(page, PAGE_SIZE);
-            if (response != null && response.content() != null) {
-                all.addAll(response.content());
+        for (int page = 0; page < MAX_PAGES; page++) {
+            try {
+                PageResponse<FinancePreInvoiceDTO> response = financeClient.getPreInvoices(page, PAGE_SIZE);
+                if (response == null) break;
+                if (response.content() != null) {
+                    all.addAll(response.content());
+                }
+                if (!response.hasNext()) break;
+            } catch (Exception e) {
+                log.error("Failed to fetch pre-invoices page {}: {}", page, e.getMessage(), e);
+                throw new RuntimeException("Failed to fetch pre-invoices — aggregation aborted to avoid incomplete data", e);
             }
-            page++;
-        } while (response != null && response.hasNext());
+        }
+        log.info("Fetched {} pre-invoices across pages", all.size());
         return all;
     }
 
@@ -407,7 +439,7 @@ public class AnalyticsAggregationScheduler {
             List<T> result = supplier.get();
             return result != null ? result : List.of();
         } catch (Exception e) {
-            log.warn("Failed to fetch data: {}", e.getMessage());
+            log.error("Failed to fetch data from downstream service: {}", e.getMessage(), e);
             return List.of();
         }
     }
