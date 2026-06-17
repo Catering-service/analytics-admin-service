@@ -126,17 +126,43 @@ public class AnalyticsAggregationScheduler {
 
             List<FinanceInvoiceDTO> invoices = fetchAllInvoices();
             List<FinancePreInvoiceDTO> preInvoices = fetchAllPreInvoices();
+            List<FinancePaymentDTO> payments = fetchAllPayments();
 
-            // Filter to current month
+            // Filter invoices to current month
             List<FinanceInvoiceDTO> monthInvoices = invoices.stream()
                     .filter(i -> i.issueDate() != null
                             && YearMonth.from(i.issueDate()).equals(now))
                     .toList();
 
-            double totalRevenue = monthInvoices.stream()
-                    .filter(i -> "PAID".equals(i.status()))
-                    .mapToDouble(i -> i.amount() != null ? i.amount().doubleValue() : 0)
+            // PAID invoices → eventId → amount (for deduplication with card payments)
+            Map<Long, Double> paidInvoiceByEvent = monthInvoices.stream()
+                    .filter(i -> "PAID".equals(i.status()) && i.eventId() != null)
+                    .collect(Collectors.toMap(
+                            FinanceInvoiceDTO::eventId,
+                            i -> i.amount() != null ? i.amount().doubleValue() : 0,
+                            Double::sum));
+
+            double invoiceRevenue = paidInvoiceByEvent.values().stream()
+                    .mapToDouble(Double::doubleValue).sum();
+
+            // Card payments: filter to current month, exclude those already covered by a PAID invoice
+            double cardRevenue = payments.stream()
+                    .filter(p -> p.date() != null
+                            && YearMonth.from(p.date()).equals(now))
+                    .filter(p -> {
+                        // Exclude payments linked to an invoice that is already PAID
+                        if (p.invoice() != null && "PAID".equals(p.invoice().status())) {
+                            return false;
+                        }
+                        // Exclude payments for events already covered by a PAID invoice
+                        Integer rawId = p.preInvoice() != null ? p.preInvoice().eventId() : null;
+                        Long eventId = rawId != null ? Long.valueOf(rawId) : null;
+                        return eventId == null || !paidInvoiceByEvent.containsKey(eventId);
+                    })
+                    .mapToDouble(p -> p.price() != null ? p.price().doubleValue() : 0)
                     .sum();
+
+            double totalRevenue = invoiceRevenue + cardRevenue;
 
             double totalExpenses = preInvoices.stream()
                     .filter(p -> p.issueDate() != null
@@ -149,7 +175,21 @@ public class AnalyticsAggregationScheduler {
             long unpaidCount = monthInvoices.stream()
                     .filter(i -> "PENDING".equals(i.status())).count();
 
-            double avgEventValue = paidCount > 0 ? totalRevenue / paidCount : 0;
+            // Count unique paid events (invoice-paid + card-paid, deduplicated)
+            long paidEventCount = paidInvoiceByEvent.size() + payments.stream()
+                    .filter(p -> p.date() != null
+                            && YearMonth.from(p.date()).equals(now))
+                    .filter(p -> {
+                        Integer rawId = p.preInvoice() != null ? p.preInvoice().eventId() : null;
+                        Long eventId = rawId != null ? Long.valueOf(rawId) : null;
+                        return eventId != null && !paidInvoiceByEvent.containsKey(eventId)
+                                && (p.invoice() == null || !"PAID".equals(p.invoice().status()));
+                    })
+                    .map(p -> Long.valueOf(p.preInvoice().eventId()))
+                    .distinct()
+                    .count();
+
+            double avgEventValue = paidEventCount > 0 ? totalRevenue / paidEventCount : 0;
             double netProfit = totalRevenue - totalExpenses;
 
             // Compute average employee rating for this month
@@ -172,7 +212,8 @@ public class AnalyticsAggregationScheduler {
                     LocalDateTime.now()
             );
             financialRepo.save(fa);
-            log.info("Financial analytics saved: revenue={}, expenses={}, profit={}", totalRevenue, totalExpenses, netProfit);
+            log.info("Financial analytics saved: invoiceRevenue={}, cardRevenue={}, total={}, expenses={}, profit={}",
+                    invoiceRevenue, cardRevenue, totalRevenue, totalExpenses, netProfit);
         }
     }
 
@@ -226,7 +267,7 @@ public class AnalyticsAggregationScheduler {
                         0, // salesCompleted - no sales tracking yet
                         revenueGenerated,
                         fetchEmployeeRating(emp.id()), // performanceRating from real data
-                        0.0, // completedOnTimePct - not yet implemented
+                        calculateOnTimePct(empTickets),
                         LocalDateTime.now()
                 );
                 employeeRepo.save(ea);
@@ -425,6 +466,25 @@ public class AnalyticsAggregationScheduler {
         return all;
     }
 
+    private List<FinancePaymentDTO> fetchAllPayments() {
+        List<FinancePaymentDTO> all = new ArrayList<>();
+        for (int page = 0; page < MAX_PAGES; page++) {
+            try {
+                PageResponse<FinancePaymentDTO> response = financeClient.getPayments(page, PAGE_SIZE);
+                if (response == null) break;
+                if (response.content() != null) {
+                    all.addAll(response.content());
+                }
+                if (!response.hasNext()) break;
+            } catch (Exception e) {
+                log.error("Failed to fetch payments page {}: {}", page, e.getMessage(), e);
+                throw new RuntimeException("Failed to fetch payments — aggregation aborted to avoid incomplete data", e);
+            }
+        }
+        log.info("Fetched {} payments across pages", all.size());
+        return all;
+    }
+
     // ──────────────────────────────────────────────
     // Safe fetch - returns empty list on failure
     // ──────────────────────────────────────────────
@@ -453,6 +513,24 @@ public class AnalyticsAggregationScheduler {
             log.debug("Could not fetch rating for employee {}: {}", employeeId, e.getMessage());
             return 0.0;
         }
+    }
+
+    /**
+     * Calculates on-time percentage for an employee's tickets.
+     * Defaults to 100% unless a ticket is still OPEN after the event date has passed.
+     * A ticket that is OPEN past the scheduled event date means the work wasn't completed on time.
+     */
+    private double calculateOnTimePct(List<UserTicketDTO> tickets) {
+        if (tickets.isEmpty()) return 100.0;
+        LocalDateTime now = LocalDateTime.now();
+        long lateCount = tickets.stream()
+                .filter(t -> "OPEN".equals(t.ticketStatus())
+                        && t.event() != null
+                        && t.event().date() != null
+                        && t.event().date().isBefore(now))
+                .count();
+        long onTime = tickets.size() - lateCount;
+        return Math.round((onTime * 100.0 / tickets.size()) * 10.0) / 10.0;
     }
 
     // ──────────────────────────────────────────────
